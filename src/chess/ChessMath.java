@@ -7,12 +7,22 @@ import chess.pieces.King;
 import chess.pieces.Rook;
 
 public class ChessMath {
+	private int turn;
+	private Color currentPlayer;
 	private Board board;
 	
 	public ChessMath() {
 		board = new Board(8, 8);
+		turn = 1;
+		currentPlayer = Color.WHITE;
 		initialSetup();
 }
+	public int getturn() {
+		return turn;
+	}
+	public Color getCurrentPlayer() {
+		return currentPlayer;
+	}
 	public ChessPiece[][] getPieces(){
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
 		for(int i=0; i<board.getRows();i++) {
@@ -34,12 +44,16 @@ public class ChessMath {
 		validateSourcePosition(source);
 		validateTargetPostion(source, target);
 		Piece capturedPiece = makeMove(source, target);
+		nextturn();
 		return (ChessPiece)capturedPiece;
 	}
 	
 	private void validateSourcePosition(Position position) {
 		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("there is no piece on source position");
+		}
+		if(currentPlayer != ((ChessPiece)board.piece(position)).getColor()){
+			throw new ChessException("the chosen piece is not yours");
 		}
 		if(!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("there is no possible moves for the chosen piece.");
@@ -58,6 +72,12 @@ public class ChessMath {
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
 		return capturedPiece;
+	}
+	
+	
+	private void nextturn() {
+		turn++;
+		currentPlayer = (currentPlayer==Color.WHITE) ? Color.BLACK : Color.WHITE;
 	}
 	
 	
